@@ -1,18 +1,50 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from 'react'
+import axios from 'axios'
+import Luettelo from './components/Luettelo'
 
-class App extends Component {
+class App extends React.Component {
+
+  constructor(props) {
+    super(props)
+    this.state = {
+      countries: [],
+      filter: ''
+    }
+  }
+
+  componentWillMount() {
+    axios
+      .get('https://restcountries.eu/rest/v2/all')
+      .then(response => {
+        this.setState({ countries: response.data })
+      })
+  }
+
+
+
+  handleFilterChange = (event) => {
+    this.setState({ filter: event.target.value })
+  }
+
+  handleClick = (country) => {
+    return () => {
+      this.setState({ filter: country })
+    }
+  }
+
+
   render() {
+    const filtered = this.state.countries.filter(maa => maa.name.toLowerCase().includes(this.state.filter.toLowerCase()))
+
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
-        </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
+      <div>
+        <div>
+          find countries: <input
+            value={this.state.filter}
+            onChange={this.handleFilterChange}
+          />
+        </div>
+        <Luettelo countries={filtered} clickFunction={this.handleClick.bind(this)} />
       </div>
     );
   }
